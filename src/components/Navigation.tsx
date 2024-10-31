@@ -7,11 +7,13 @@ import icStarGray from "../assets/icStarGray.svg";
 import styled from "styled-components";
 
 const Nav = styled.nav`
-  position: absolute;
+  position: fixed;
   bottom: 0;
   background-color: white;
   width: 100%;
   height: 60px;
+  margin: 0 auto;
+  width: 390px;
   display: flex;
   justify-content: center;
   align-items: center;

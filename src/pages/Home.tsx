@@ -3,11 +3,15 @@ import Card from "../components/Card";
 import Checkbox from "../components/CheckBox";
 import Switch from "../components/Switch";
 import TextInput from "../components/TextInput";
+import VoiceInput from "../components/VoiceInput";
 import { counterState } from "../atoms";
 import { useRecoilState } from "recoil";
+import { useState } from "react";
 
 const Home = () => {
   const [count, setCount] = useRecoilState(counterState);
+  const [origin, setOrigin] = useState("");
+  const [destination, setDestination] = useState("");
 
   const increment = () => setCount(count + 1);
   const decrement = () => setCount(count - 1);
@@ -58,6 +62,24 @@ const Home = () => {
         isAlertEnabled={true}
         onToggleAlert={() => {}}
         onDeleteAlert={() => {}}
+      />
+      <VoiceInput
+        originValue={origin}
+        destinationValue={destination}
+        stopsValue="3"
+        onOriginFocus={() => {}}
+        onDestinationFocus={() => {}}
+        onStopsFocus={() => {}}
+        onOriginChange={(e) => {
+          setOrigin(e.target.value);
+        }}
+        onDestinationChange={(e) => {
+          setDestination(e.target.value);
+        }}
+        onStopsChange={() => {}}
+        onMicClick={() => {}}
+        onCloseClick={() => {}}
+        isListening={false}
       />
     </>
   );
