@@ -1,5 +1,7 @@
+import VoiceTest from "../VoiceTest";
+
 const Login = () => {
-  return <div>Login</div>;
+ return <VoiceTest/>;
 };
 
 export default Login;

@@ -1,13 +1,8 @@
-import { useCallback, useEffect, useState } from "react";
-
-import OpenAI from "openai";
+import axios from "axios";
 import styled from "styled-components";
-
-interface Route {
-  departures: string;
-  destinations: string;
-  stops: number;
-}
+import { useVoiceRecognition } from "./hooks/use-voice-recognition";
+import { getBusRoute } from "./utils/get-bus-route";
+import { transAddressToXY } from "./utils/trans-address-to-xy";
 
 const Container = styled.div`
   font-family: Arial, sans-serif;
@@ -49,108 +44,57 @@ const Input = styled.input`
   border-radius: 4px;
 `;
 
-const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
-const openai = new OpenAI({ apiKey, dangerouslyAllowBrowser: true });
-
 const VoiceTest = () => {
-  const [isRecording, setIsRecording] = useState(false);
-  const [recognizedText, setRecognizedText] = useState("");
-  const [aiResponse, setAiResponse] = useState("");
+  const { isRecording, recognizedText, aiResponse, handleRecording } = useVoiceRecognition();
 
-  useEffect(() => {
-    const SpeechRecognition =
-      window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SpeechRecognition) {
-      alert("죄송합니다. 이 브라우저는 음성 인식을 지원하지 않습니다.");
+  const onSubmit = async () => {
+    if (!aiResponse) {
+      alert("AI 응답이 없었다.")
+      return
     }
-  }, []);
 
-  const callOpenAI2 = async (text: string) => {
-    const userInput = `${text}---------
-    이게 사용자로부터 온 문장인데 여기서 출발지, 도착지, 정류장을 추출해서 그것만 뽑아줘
-    3개의 단어가 나올거 잖아 각각 ,을 구분해서 줘 예로 들어서 서울,인천,3
-    아 추가로 오개전이면 5로 해석 즉 십개전이면 10 이런식으로 해야돼`;
+    if (!aiResponse.stops) { 
+      alert("정류장 수가 없다.")
+      return
+    }
+    if (!aiResponse.departures) { 
+      alert("출발지가 없다.")
+      return
+    }
+    if (!aiResponse.destinations) { 
+      alert("도착지가 없다.")
+      return
+    }
+    const startXY = await transAddressToXY(aiResponse.departures)
+    const endXY = await transAddressToXY(aiResponse.destinations)
 
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: [
-        {
-          role: "system",
-          content: "너는 뉴스 주요문장을 생성해주는 사람이야",
-        },
-        {
-          role: "user",
-          content: userInput,
-        },
-      ],
-      response_format: {
-        type: "json_schema",
-        json_schema: {
-          name: "response",
-          schema: {
-            type: "object",
-            properties: {
-              departures: {
-                description: "출발지",
-                type: "string",
-              },
-              destinations: {
-                description: "도착지",
-                type: "string",
-              },
-              stops: {
-                description: "정류장수",
-                type: "number",
-              },
-            },
-            additionalProperties: false,
-          },
-        },
-      },
-    });
+    const busRoute = await getBusRoute(startXY, endXY)
 
-    console.log("입력", completion.choices[0].message.content);
+    const departure = aiResponse.departures
+    const destination = aiResponse.destinations
+    const station = aiResponse.stops
+    const stationId = busRoute?.sStationId
+    const notionId = busRoute?.routeNum.split(":")[1]
+    const time = getCurTime()
 
-    const jsonString = completion.choices[0].message.content;
-    if (jsonString === null) return;
-    const route: Route = JSON.parse(jsonString);
-    if (route.stops === 0) route.stops = 5;
-    setAiResponse(
-      `출발지: ${route.departures}, 도착지: ${route.destinations}, 정류장수: ${route.stops}`
-    );
-  };
 
-  const handleRecording = useCallback(() => {
-    const SpeechRecognition =
-      window.SpeechRecognition || window.webkitSpeechRecognition;
-    const newRecognition = new SpeechRecognition();
+    console.log(departure, destination, station, stationId, notionId, time)
+    const response = await axios.post("/api/bus/save",{
+      departure,
+      destination,
+      station,
+      stationId,
+      notionId,
+      time,
+    })
 
-    newRecognition.lang = "ko-KR";
-    newRecognition.interimResults = false;
-    newRecognition.maxAlternatives = 1;
-
-    newRecognition.onresult = (event: SpeechRecognitionEvent) => {
-      const transcript = event.results[0][0].transcript;
-      setRecognizedText(transcript);
-      console.log("Confidence:", event.results[0][0].confidence);
-      callOpenAI2(transcript);
-    };
-
-    newRecognition.onerror = (event: SpeechRecognitionErrorEvent) => {
-      alert(`오류 발생: ${event.error}`);
-    };
-
-    newRecognition.onspeechend = () => {
-      newRecognition.stop();
-    };
-
-    newRecognition.onend = () => {
-      setIsRecording(false);
-    };
-
-    newRecognition.start();
-    setIsRecording(true);
-  }, []);
+    if (response.status === 200) {
+      alert("저장 완료")
+      console.log(response.data)
+    } else {
+      alert("저장 실패")
+    }
+  }
 
   return (
     <Container>
@@ -171,12 +115,36 @@ const VoiceTest = () => {
       <br />
       <Input
         type="text"
-        value={aiResponse}
-        placeholder="AI가 추출한 정보가 여기에 표시됩니다."
+        value={aiResponse ? `출발지: ${aiResponse.departures}` : ''}
+        placeholder="AI가 추출한 정보 중 출발지"
         readOnly
       />
+       <Input
+        type="text"
+        value={aiResponse ? `출발지: ${aiResponse.destinations}` : ''}
+        placeholder="AI가 추출한 정보 중 도착지"
+        readOnly
+      />
+      <Input
+        type="text"
+        value={aiResponse ? `출발지: ${aiResponse.stops}` : '0'}
+        placeholder="AI가 추출한 정보 중 정류장 수"
+        readOnly
+      />
+
+    <Button onClick={onSubmit} isRecording={isRecording}>
+        서버로 전송
+      </Button>
     </Container>
   );
 };
 
 export default VoiceTest;
+
+const getCurTime = () => {
+  const now = Date.now()
+  const date = new Date(now)
+  const hours = date.getHours()
+  const minutes = date.getMinutes()
+  return `${hours}:${minutes}`
+}
