@@ -1,3 +1,4 @@
+import Button from "../components/Button";
 import { counterState } from "../atoms";
 import { useRecoilState } from "recoil";
 
@@ -18,6 +19,7 @@ const Home = () => {
           <button onClick={increment}>+</button>
         </div>
       </div>
+      <Button size="large">버튼</Button>
     </>
   );
 };
