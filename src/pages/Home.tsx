@@ -1,4 +1,5 @@
 import Button from "../components/Button";
+import Checkbox from "../components/CheckBox";
 import Switch from "../components/Switch";
 import TextInput from "../components/TextInput";
 import { counterState } from "../atoms";
@@ -26,6 +27,8 @@ const Home = () => {
       <TextInput label="출발지" value="인풋내용" />
       <hr />
       <Switch selected={count % 2 == 0} onToggle={() => {}} />
+      <hr />
+      <Checkbox checked={count % 2 == 0} onToggle={() => {}} />
     </>
   );
 };
