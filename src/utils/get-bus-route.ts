@@ -11,7 +11,9 @@ type BusRouteType = {
 }
 
 export async function getBusRoute(startXY: GeoXYType, endXY: GeoXYType) {
-  const tmapKey =  import.meta.env.VITE_TMAP_APP_KEY
+  console.log(startXY, endXY)
+  const tmapKey = import.meta.env.VITE_TMAP_APP_KEY
+  console.log(tmapKey)
   /** 실제 api 호출 */
   // const response = await axios.post(`https://apis.openapi.sk.com/transit/routes`, {
   //   startX: startXY.x, // 출발 경로
