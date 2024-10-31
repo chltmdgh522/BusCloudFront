@@ -1,4 +1,5 @@
 import Button from "../components/Button";
+import Card from "../components/Card";
 import Checkbox from "../components/CheckBox";
 import Switch from "../components/Switch";
 import TextInput from "../components/TextInput";
@@ -29,6 +30,35 @@ const Home = () => {
       <Switch selected={count % 2 == 0} onToggle={() => {}} />
       <hr />
       <Checkbox checked={count % 2 == 0} onToggle={() => {}} />
+      <hr />
+      <Card
+        title="목적지"
+        departure="제주공항"
+        destination="제주시청"
+        buses={[
+          {
+            busNumber: "100",
+            color: "red",
+            stops: 3,
+          },
+          {
+            busNumber: "101",
+            color: "green",
+            stops: 5,
+          },
+        ]}
+        isAlertEnabled={true}
+      />
+      <Card
+        title="목적지"
+        departure="제주공항"
+        destination="제주시청"
+        alertTime="12:00 ~ 15:00"
+        alertStop={3}
+        isAlertEnabled={true}
+        onToggleAlert={() => {}}
+        onDeleteAlert={() => {}}
+      />
     </>
   );
 };

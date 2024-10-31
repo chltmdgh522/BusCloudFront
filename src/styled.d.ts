@@ -95,6 +95,11 @@ declare module "styled-components" {
         lineHeight: string;
         fontWeight: string;
       };
+      b1md16: {
+        fontSize: string;
+        lineHeight: string;
+        fontWeight: string;
+      };
     };
   }
 }
