@@ -1,4 +1,5 @@
 import Button from "../components/Button";
+import TextInput from "../components/TextInput";
 import { counterState } from "../atoms";
 import { useRecoilState } from "recoil";
 
@@ -20,6 +21,8 @@ const Home = () => {
         </div>
       </div>
       <Button size="large">버튼</Button>
+      <hr />
+      <TextInput label="출발지" value="인풋내용" />
     </>
   );
 };
