@@ -77,7 +77,7 @@ const VoiceTest = () => {
     const notionId = busRoute?.routeNum.split(":")[1]
     const time = getCurTime()
 
-
+    const phone = localStorage.getItem("phone")
     console.log(departure, destination, station, stationId, notionId, time)
     const response = await axios.post("/api/bus/save",{
       departure,
@@ -86,6 +86,10 @@ const VoiceTest = () => {
       stationId,
       notionId,
       time,
+    }, {
+      headers: {
+        "Authorization": `Bearer ${phone}`
+      }
     })
 
     if (response.status === 200) {
