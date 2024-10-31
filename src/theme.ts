@@ -92,5 +92,10 @@ export const theme = {
       lineHeight: "30px",
       fontWeight: "regular",
     },
+    b1md16: {
+      fontSize: "16px",
+      lineHeight: "25px",
+      fontWeight: "medium",
+    },
   },
 };

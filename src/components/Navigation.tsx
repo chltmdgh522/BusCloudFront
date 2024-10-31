@@ -2,6 +2,8 @@ import { Link, useLocation } from "react-router-dom";
 
 import icHomeActive from "../assets/icHomeActive.svg";
 import icHomeGray from "../assets/icHomeGray.svg";
+import icStarActive from "../assets/icStarActive.svg";
+import icStarGray from "../assets/icStarGray.svg";
 import styled from "styled-components";
 
 const Nav = styled.nav`
@@ -30,9 +32,9 @@ const NavItem = styled.li<{ active: boolean }>`
   align-items: center;
   color: ${(props) =>
     props.active ? props.theme.colors.orange03 : props.theme.colors.gray500};
-  font-size: ${(props) => props.theme.text.t2md18.fontSize};
-  font-weight: ${(props) => props.theme.text.t2md18.fontWeight};
-  line-height: ${(props) => props.theme.text.t2md18.lineHeight};
+  font-size: ${(props) => props.theme.text.b1md16.fontSize};
+  font-weight: ${(props) => props.theme.text.b1md16.fontWeight};
+  line-height: ${(props) => props.theme.text.b1md16.lineHeight};
   flex: 1;
 
   a {
@@ -64,7 +66,7 @@ const Navigation = () => {
         </NavItem>
         <NavItem active={!isHome}>
           <Link to="/favorite">
-            <img src={isHome ? icHomeGray : icHomeActive} />
+            <img src={isHome ? icStarGray : icStarActive} />
             <span>즐겨찾기</span>
           </Link>
         </NavItem>
